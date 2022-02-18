@@ -1,0 +1,58 @@
+.home-background {
+    background-image: url('../../assets/img/home-bg.jpg');
+    background-size: cover;
+}
+
+.token-sale-container {
+    text-align: center;
+    
+    .token-sale-title {
+        margin-top: 2em;
+        color: white;
+        line-height: 60px;
+        font-size: 50px !important;
+        font-weight: 200;
+        font-family: 'Montserrat';
+        text-align: center;
+    }
+    
+    .token-sale-timer-container {
+        .token-sale-timer {
+            margin-top: .4em;
+            color: #00bcd4;
+            font-size: 50px !important;
+            font-family: 'Montserrat';
+            text-align: center;
+        }
+    }
+    
+    .token-available {
+        margin-top: .4em;
+        color: white;
+        font-size: 28px !important;
+        font-family: 'Montserrat';
+        text-align: center;
+    }
+    
+    .buy-token-button {
+        border-radius: 32px;
+        border: solid rgb(246, 172, 64);
+        border-width: 1px;
+    
+        color: rgb(246, 172, 64);
+        opacity: 1;
+        background-color: transparent;
+        font-size: 28px !important;
+        font-family: 'Montserrat';
+    
+        display: inline-block;
+        white-space: nowrap;
+        vertical-align: middle;
+        line-height: 46px;
+        padding: 0 25px;
+    
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 2em;
+    }
+}

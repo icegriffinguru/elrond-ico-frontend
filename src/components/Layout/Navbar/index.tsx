@@ -35,6 +35,13 @@ const Navbar = () => {
             </NavItem>
           )}
         </Nav>
+        <Link
+          to={routeNames.unlock}
+          className='btn btn-primary mt-3 text-white'
+          data-testid='loginBtn'
+        >
+          Connect Wallet
+        </Link>
       </div>
     </BsNavbar>
   );

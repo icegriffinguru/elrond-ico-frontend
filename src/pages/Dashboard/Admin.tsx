@@ -36,12 +36,16 @@ import {
   QueryResponseBundle,
   ReturnCode,
   TypedValue,
+  U64Value
 } from '@elrondnetwork/erdjs';
 import BigNumber from '@elrondnetwork/erdjs/node_modules/bignumber.js/bignumber.js';
+import DateTimePicker from 'react-datetime-picker';
+
 import {
   stringToHex,
   decimalToHex
 } from '../../utils/encode';
+import { time } from 'console';
 
 const Admin = () => {
   const { address, account } = useGetAccountInfo();
@@ -57,8 +61,9 @@ const Admin = () => {
   const [tokenId, setTokenId] = React.useState<string | undefined>();
   const [tokenPrice, setTokenPrice] = React.useState<number>();
   const [buyLimit, setBuyLimit] = React.useState<number>();
-  const [startTime, setStartTime] = React.useState<Date>();
-  const [duration, setDuration] = React.useState<Date>();
+  const [startTime, setStartTime] = React.useState<number>();
+  const [endTime, setEndTime] = React.useState<number>();
+  const Millis = 1000;
 
   const [contract, setContract] = React.useState<SmartContract>();
 
@@ -115,7 +120,28 @@ const Admin = () => {
       setBuyLimit(value);
     })();
   });
+
+  React.useEffect(() => {
+    if (!contract) return;
+    (async () => {
+      const interaction: Interaction = contract.methods.getStartTime();
+      const res: QueryResponseBundle | undefined = await sendQuery(interaction);
+      if (!res || !res.returnCode.isSuccess()) return;
+      const value = parseInt(res.firstValue.valueOf());
+      setStartTime(value);
+    })();
+  });
   
+  React.useEffect(() => {
+    if (!contract) return;
+    (async () => {
+      const interaction: Interaction = contract.methods.getEndTime();
+      const res: QueryResponseBundle | undefined = await sendQuery(interaction);
+      if (!res || !res.returnCode.isSuccess()) return;
+      const value = parseInt(res.firstValue.valueOf());
+      setEndTime(value);
+    })();
+  });
 
   const sendTransaction = async (functionName: string, args: any[]) => {
     if (!contract) return;
@@ -168,6 +194,33 @@ const Admin = () => {
     sendTransaction('updateBuyLimit', args);
   };
 
+  const updateTimes = (e: any) => {
+    e.preventDefault();
+    if (!startTime || !endTime){
+      alert('Start Time and End Time should be set.');
+      return;
+    }
+    if (startTime <= (new Date).getTime() / Millis){
+      alert('Start Time cannot be past.');
+      return;
+    }
+    if (startTime >= endTime){
+      alert('Start Time cannot be before than End Time.');
+      return;
+    }
+    const args = [new U64Value(new BigNumber(startTime)), new U64Value(new BigNumber(endTime))];
+    sendTransaction('updateBuyLimit', args);
+  };
+
+  //
+  const onStartTimeChanged = (t: Date) => {
+    setStartTime(t.getTime() / Millis);
+  };
+
+  const onEndTimeChanged = (t: Date) => {
+    setEndTime(t.getTime() / Millis);
+  };
+
   return (
     <form className='dashboard-container'>
       <h2 className='dashboard-title'>Admin Page</h2>
@@ -197,6 +250,25 @@ const Admin = () => {
         </div>
         <div className="col-sm-2">
           <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateBuyLimit}>Update</button>
+        </div>
+      </div>
+      <div className="form-group row">
+        <label className="col-sm-3 col-form-label">Activation Time:</label>
+        <div className="col-sm-7">
+          <DateTimePicker
+            value={new Date(startTime ? startTime : 0)}
+            onChange={onStartTimeChanged} />
+        </div>
+      </div>
+      <div className="form-group row">
+        <label className="col-sm-3 col-form-label">End Time:</label>
+        <div className="col-sm-7">
+          <DateTimePicker
+            value={new Date((endTime ? endTime : 0))}
+            onChange={onEndTimeChanged} />
+        </div>
+        <div className="col-sm-2">
+          <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateTimes}>Update</button>
         </div>
       </div>
     </form>

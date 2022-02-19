@@ -55,7 +55,37 @@ export const getEsdtBalance = async ({
   timeout
 }: GetEsdtBalanceType) => {
   try {
-    const { data } = await axios.get(`${apiAddress}/address/${address}/esdt/${tokenId}`, {
+    const url = `${apiAddress}/address/${address}/esdt/${tokenId}`;
+    console.log('url', url);
+    const { data } = await axios.get(url, {
+      timeout
+    });
+
+    return {
+      data: data.data,
+      success: data !== undefined && data.code == 'successful'
+    };
+  } catch (err) {
+    return {
+      success: false
+    };
+  }
+};
+
+interface GetEgldBalanceType {
+  apiAddress: string;
+  address: string;
+  timeout: number;
+}
+
+export const getEgldBalance = async ({
+  apiAddress,
+  address,
+  timeout
+}: GetEgldBalanceType) => {
+  try {
+    const url = `${apiAddress}/address/${address}/balance`;
+    const { data } = await axios.get(url, {
       timeout
     });
 

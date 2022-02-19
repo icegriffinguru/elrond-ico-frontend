@@ -1,11 +1,5 @@
 import * as React from 'react';
 import {
-  contractAddress,
-  contractAbiUrl,
-  contractName
-} from 'config';
-
-import {
   transactionServices,
   useGetAccountInfo,
   useGetPendingTransactions,
@@ -45,6 +39,16 @@ import {
   stringToHex,
   decimalToHex
 } from '../../utils/encode';
+import {
+  contractAddress,
+  contractAbiUrl,
+  contractName,
+  gatewayUrl
+} from 'config';
+import  {
+  getEsdtBalance,
+  getEgldBalance
+} from 'apiRequests';
 
 const BuyTokens = () => {
   const { address, account } = useGetAccountInfo();
@@ -55,7 +59,11 @@ const BuyTokens = () => {
 
   console.log('account', account);
 
-  const [tokenPrice, setTokenPrice] = React.useState<number | undefined>();
+  const [egldBalance, setEgldBalance] = React.useState<number>();
+  const [esdtBalance, setEsdtBalance] = React.useState<number>();
+
+  const [tokenId, setTokenId] = React.useState<string | undefined>();
+  const [tokenPrice, setTokenPrice] = React.useState<number>();
   const [buyLimit, setBuyLimit] = React.useState<number>();
   const [buyAmountInEsdt, setBuyAmountInEsdt] = React.useState<number>(0);
   const [buyAmountInEgld, setBuyAmountInEgld] = React.useState<number>(0);
@@ -88,6 +96,17 @@ const BuyTokens = () => {
   React.useEffect(() => {
     if (!contract) return;
     (async () => {
+      const interaction: Interaction = contract.methods.getTokenId();
+      const res: QueryResponseBundle | undefined = await sendQuery(interaction);
+      if (!res || !res.returnCode.isSuccess()) return;
+      const value = res.firstValue.valueOf().toString();
+      setTokenId(value);
+    })();
+  }, [contract]);
+
+  React.useEffect(() => {
+    if (!contract) return;
+    (async () => {
       const interaction: Interaction = contract.methods.getTokenPrice();
       const res: QueryResponseBundle | undefined = await sendQuery(interaction);
       if (!res || !res.returnCode.isSuccess()) return;
@@ -106,6 +125,58 @@ const BuyTokens = () => {
       setBuyLimit(value);
     })();
   }, [contract]);
+
+
+  /// gateway
+
+  React.useEffect(() => {
+    getEgldBalance({
+      apiAddress: gatewayUrl,
+      address: address,
+      timeout: 3000
+    }).then(({ data, success }) => {
+      console.log('success', success);
+      console.log('data', data);
+      if (success) {
+        let decoded;
+        decoded = data.balance;
+        decoded = Egld.raw(new BigNumber(decoded)).toDenominated();
+        decoded = parseFloat(decoded);
+        setEgldBalance(decoded);
+      }
+      else {
+        setEgldBalance(undefined);
+      }
+    });
+  }, [hasPendingTransactions]);
+
+  React.useEffect(() => {
+    if (!tokenId) return;
+    console.log('tokenId', tokenId);
+
+    getEsdtBalance({
+      apiAddress: gatewayUrl,
+      address: address,
+      tokenId: tokenId,
+      timeout: 3000
+    }).then(({ data, success }) => {
+      console.log('success', success);
+      console.log('data', data);
+      if (success && !!data.tokenData) {
+        let decoded;
+        decoded = data.tokenData.balance;
+        decoded = Egld.raw(new BigNumber(decoded)).toDenominated();
+        decoded = parseFloat(decoded);
+        console.log('Esdt', decoded);
+        setEsdtBalance(decoded);
+      }
+      else {
+        setEsdtBalance(undefined);
+      }
+    });
+  }, [tokenId, hasPendingTransactions]);
+
+  /// transactions
 
   const sendTransaction = async (functionName: string, args: any[], value = 0) => {
     if (!contract) return;
@@ -156,31 +227,37 @@ const BuyTokens = () => {
     <form className='dashboard-container'>
       <h2 className='dashboard-title'>Account Balance</h2>
       <div className="form-group row mt-1">
-        <label className="col-sm-2 col-form-label">ESDT</label>
+        <label className="col-sm-2 col-form-label">EGLD</label>
         <div className="col-sm-10">
-          <input type="text" readOnly className="form-control-plaintext px-2" value="100" />
+          <input type="text" readOnly className="form-control-plaintext px-2" value={egldBalance === undefined ? '-' : egldBalance} />
         </div>
       </div>
       <div className="form-group row mt-1">
         <label className="col-sm-2 col-form-label">$SVEN</label>
         <div className="col-sm-10">
-          <input type="text" readOnly className="form-control-plaintext px-2" value="0" />
+          <input type="text" readOnly className="form-control-plaintext px-2" value={esdtBalance == undefined ? '-' : esdtBalance} />
         </div>
       </div>
       <hr className='mb-4' />
 
       <h2 className='dashboard-title'>Buy Tokens</h2>
       <div className="form-group row">
+        <label className="col-sm-3 col-form-label">Token Identifier:</label>
+        <div className="col-sm-9">
+          <input type="text" readOnly className="form-control-plaintext px-2" value={tokenId == undefined ? '-' : tokenId} />
+        </div>
+      </div>
+      <div className="form-group row">
         <label className="col-sm-3 col-form-label">Token Price:</label>
         <div className="col-sm-7">
-          <input type="text" readOnly className="form-control-plaintext px-2" value={tokenPrice} />
+          <input type="text" readOnly className="form-control-plaintext px-2" value={tokenPrice == undefined ? '-' : tokenPrice} />
         </div>
         <div className='col-sm-2'>EGLD</div>
       </div>
       <div className="form-group row">
         <label className="col-sm-3 col-form-label">Buy Limit:</label>
         <div className="col-sm-7">
-          <input type="text" readOnly className='form-control-plaintext px-2' value={buyLimit == 0 ? 'No Limit' : buyLimit} />
+          <input type="text" readOnly className='form-control-plaintext px-2' value={(buyLimit == undefined || buyLimit == 0) ? '-' : buyLimit} />
         </div>
         <div className='col-sm-2'>EGLD</div>
       </div>

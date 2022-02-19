@@ -69,8 +69,32 @@ const Admin = () => {
     setTokenId(decoded);
   };
 
+  const parseTokenPriceQuery = (returnData: any) => {
+    let [decoded] = returnData;
+    decoded = Buffer.from(decoded, 'base64').toString('hex');
+    decoded = parseInt(decoded, 16);
+    decoded = Egld.raw(decoded).toDenominated();
+    decoded = parseFloat(decoded);
+    setTokenPrice(decoded);
+  };
+
+  const parseBuyLimitQuery = (returnData: any) => {
+    let [decoded] = returnData;
+    decoded = Buffer.from(decoded, 'base64').toString('hex');
+    decoded = parseInt(decoded, 16);
+    decoded = Egld.raw(decoded).toDenominated();
+    decoded = parseFloat(decoded);
+    setBuyLimit(decoded);
+  };
+
   React.useEffect(() => {
     sendQuery('getTokenId', parseTokenIdQuery);
+  }, []);
+  React.useEffect(() => {
+    sendQuery('getTokenPrice', parseTokenPriceQuery);
+  }, []);
+  React.useEffect(() => {
+    sendQuery('getBuyLimit', parseBuyLimitQuery);
   }, []);
 
   /// transaction
@@ -106,6 +130,25 @@ const Admin = () => {
     sendUpdatePriceTransaction('updateTokenId', args);
   };
 
+  const updateTokenPrice = (e: any) => {
+    e.preventDefault();
+    if (!tokenPrice){
+      alert('Token Price cannot be null.');
+      return;
+    }
+    const args = [new BigUIntValue(Balance.egld(tokenPrice).valueOf())];
+    sendUpdatePriceTransaction('updateTokenPrice', args);
+  };
+
+  const updateBuyLimit = (e: any) => {
+    e.preventDefault();
+    if (!buyLimit){
+      alert('Buy Limit cannot be null.');
+      return;
+    }
+    const args = [new BigUIntValue(Balance.egld(buyLimit).valueOf())];
+    sendUpdatePriceTransaction('updateBuyLimit', args);
+  };
 
   return (
     <form className='dashboard-container'>
@@ -113,19 +156,31 @@ const Admin = () => {
       <div className="form-group row mt-4">
         <label className="col-sm-3 col-form-label">Token Identifier:</label>
         <div className="col-sm-7">
-          <input type="text" className="form-control" id="esdtAmount" value={!!tokenId ? tokenId : ''} onChange={(e) => setTokenId(e.target.value)} />
+          <input type="text" className="form-control" id="esdtAmount" defaultValue={tokenId} onChange={(e) => setTokenId(e.target.value)} />
         </div>
         <div className="col-sm-2">
           <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateTokenId}>Update</button>
         </div>
       </div>
       <div className="form-group row">
-        <label className="col-sm-2 col-form-label">$EGLD</label>
-        <div className="col-sm-10">
-          <input type="number" className="form-control" id="egldAmount" />
+        <label className="col-sm-3 col-form-label">Token Price:</label>
+        <div className="col-sm-5">
+          <input type="number" className="form-control" id="esdtAmount" defaultValue={tokenPrice} onChange={(e) => setTokenPrice(parseFloat(e.target.value))} />
+        </div>
+        <div className='col-sm-2'>EGLD</div>
+        <div className="col-sm-2">
+          <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateTokenPrice}>Update</button>
         </div>
       </div>
-      <button className="btn btn-primary mb-2 px-4 buy-tokens-button">Buy</button>
+      <div className="form-group row">
+        <label className="col-sm-3 col-form-label">Buy Limit:</label>
+        <div className="col-sm-7">
+          <input type="text" className="form-control" id="esdtAmount" defaultValue={buyLimit} onChange={(e) => setBuyLimit(parseFloat(e.target.value))} />
+        </div>
+        <div className="col-sm-2">
+          <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateBuyLimit}>Update</button>
+        </div>
+      </div>
     </form>
   );
 };

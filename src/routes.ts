@@ -6,7 +6,7 @@ import Transaction from './pages/Transaction';
 
 export const routeNames = {
   home: '/',
-  dashboard: '/dashboard',
+  dashboard: '/dashboard/*',
   transaction: '/transaction',
   unlock: '/unlock',
   ledger: '/ledger',

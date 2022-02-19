@@ -5,7 +5,7 @@ import { ProgressBar } from 'react-bootstrap';
 
 const Timer = (props: any) => {
     const Ref = useRef<any>(null);
-    const [timer, setTimer] = useState('00:00:00:00');
+    const [timer, setTimer] = useState('10:05:34:58');
     const [timeRemaining, settimeRemaining] = useState(0);
     const [completed, setCompleted] = useState(0);
 

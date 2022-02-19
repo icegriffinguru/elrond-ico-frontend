@@ -54,5 +54,13 @@
         margin-left: auto;
         margin-right: auto;
         margin-top: 2em;
+
+        text-decoration: none;
+
+        &:hover {
+            color: #222e36;
+            background-color: #f6ac40;
+            cursor: pointer;
+        }
     }
 }

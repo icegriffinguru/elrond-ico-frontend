@@ -33,13 +33,27 @@ const App = () => {
               path={routeNames.unlock}
               element={<UnlockPage loginRoute={routeNames.dashboard} />}
             />
-            {routes.map((route: any, index: number) => (
-              <Route
-                path={route.path}
-                key={'route-key-' + index}
-                element={<route.component />}
-              />
-            ))}
+            {routes.map((route: any, index: number) => {
+              if (route.path == '/dashboard') {
+                return (
+                  <Route
+                    path='/dashboard/*'
+                    key={'route-key-' + index}
+                    element={<route.component />}
+                  />
+                );
+              } else {
+                return (
+                  <Route
+                    path={route.path}
+                    key={'route-key-' + index}
+                    element={<route.component />}
+                  />
+                );
+              }
+                   
+                }
+            )}
             <Route path='*' element={<PageNotFound />} />
           </Routes>
         </Layout>

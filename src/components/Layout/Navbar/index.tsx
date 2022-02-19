@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { dAppName } from 'config';
 import { routeNames } from 'routes';
 import { ReactComponent as ElrondLogo } from './../../../assets/img/elrond.svg';
+import './index.scss';
 
 const Navbar = () => {
   const { address } = useGetAccountInfo();
@@ -19,11 +20,23 @@ const Navbar = () => {
     <BsNavbar className='bg-white border-bottom px-4 py-3'>
       <div className='container-fluid'>
         <Link
-          className='d-flex align-items-center navbar-brand mr-0'
-          to={isLoggedIn ? routeNames.dashboard : routeNames.home}
+          className='d-flex align-items-center navbar-brand mr-4'
+          to='/'
         >
           <ElrondLogo className='elrond-logo' />
-          <span className='dapp-name text-muted'>{dAppName}</span>
+        </Link>
+
+        <Link
+          className='d-flex align-items-center navbar-brand mr-4'
+          to='/dashboard/buy'
+        >
+          BUY
+        </Link>
+        <Link
+          className='d-flex align-items-center navbar-brand mr-2'
+          to='/dashboard/Admin'
+        >
+          ADMIN
         </Link>
 
         <Nav className='ml-auto'>
@@ -35,6 +48,7 @@ const Navbar = () => {
             </NavItem>
           )}
         </Nav>
+
         <Link
           to={routeNames.unlock}
           className='btn btn-primary mt-3 text-white'

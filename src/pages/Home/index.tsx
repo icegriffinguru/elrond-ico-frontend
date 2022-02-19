@@ -16,7 +16,18 @@ const Home = () => {
           <div className='token-sale-title'>Token Sale ends in:</div>
           <Timer />
           <div className='token-available'>5023411 $SVEN Available</div>
-          <div className='buy-token-button'>Buy Token</div>
+          <Link
+            to='dashboard/buy'
+            className='buy-token-button mr-2'
+          >
+            Buy Token
+          </Link>
+          <Link
+            to='dashboard/admin'
+            className='buy-token-button'
+          >
+            Admin
+          </Link>
         </div>
       </div>
     </div>

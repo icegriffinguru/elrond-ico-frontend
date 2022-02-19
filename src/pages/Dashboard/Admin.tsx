@@ -279,9 +279,10 @@ const Admin = () => {
           <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateTimes}>Update</button>
         </div>
       </div>
-      <div className="form-group row">
-        <div className="col-sm-5"></div>
-        <div className="col-sm-2">
+      <hr />
+      <div className="form-group row mt-2">
+        <div className="col-sm-4"></div>
+        <div className="col-sm-4">
           <button className="btn btn-primary px-3 my-1 input-right-button" onClick={withdrawEgld}>Withdraw Egld</button>
         </div>
       </div>

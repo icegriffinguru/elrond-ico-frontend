@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { contractAddress } from 'config';
+import {
+  contractAddress,
+  contractAbiUrl,
+  contractName
+} from 'config';
 
 import {
   transactionServices,
@@ -25,7 +29,10 @@ import {
   Balance,
   BytesValue,
   ArgSerializer,
-  TransactionPayload
+  TransactionPayload,
+  AbiRegistry,
+  SmartContractAbi,
+  Interaction
 } from '@elrondnetwork/erdjs';
 import BigNumber from '@elrondnetwork/erdjs/node_modules/bignumber.js/bignumber.js';
 import {
@@ -33,20 +40,46 @@ import {
   decimalToHex
 } from '../../utils/encode';
 
-const Admin = () => {
+const Admin = async () => {
   const { address, account } = useGetAccountInfo();
   const { hasPendingTransactions } = useGetPendingTransactions();
   const { network } = useGetNetworkConfig();
   const proxy = new ProxyProvider(network.apiAddress);
   const { sendTransactions } = transactionServices;
 
+  // const contract = new SmartContract({ address: new Address(contractAddress) });
+  const abiRegistry = await AbiRegistry.load({
+    files: [contractAbiUrl],
+  });
+  const contract = new SmartContract({
+    address: new Address(contractAddress),
+    abi: new SmartContractAbi(abiRegistry, [contractName]),
+  });
+
   console.log('account', account);
 
   const [tokenId, setTokenId] = React.useState<string>();
   const [tokenPrice, setTokenPrice] = React.useState<number>();
   const [buyLimit, setBuyLimit] = React.useState<number>();
+  const [startTime, setStartTime] = React.useState<Date>();
+  const [duration, setDuration] = React.useState<Date>();
 
   /// query
+  // const sendQuery = (functionName: string, getQueryResult: any) => {
+  //   const query = new Query({
+  //     address: new Address(contractAddress),
+  //     func: new ContractFunction(functionName)
+  //   });
+  //   proxy
+  //     .queryContract(query)
+  //     .then(({ returnData }) => {
+  //       console.log('Query: ', functionName, returnData);
+  //       getQueryResult(returnData);
+  //     })
+  //     .catch((err) => {
+  //       console.error(`Unable to call ${functionName} VM query`, err);
+  //     });
+  // };
   const sendQuery = (functionName: string, getQueryResult: any) => {
     const query = new Query({
       address: new Address(contractAddress),
@@ -87,18 +120,26 @@ const Admin = () => {
     setBuyLimit(decoded);
   };
 
+  const parseStartTimeQuery = (returnData: any) => {
+    let [decoded] = returnData;
+    decoded = Buffer.from(decoded, 'base64').toString('hex');
+    decoded = parseInt(decoded, 16);
+    decoded = new Date(decoded * 1000);
+    setBuyLimit(decoded);
+  };
+
   React.useEffect(() => {
-    sendQuery('getTokenId', parseTokenIdQuery);
+    const interaction: Interaction = contract.methods.getTokenId();
+    sendQuery(interaction, parseTokenIdQuery);
   }, []);
-  React.useEffect(() => {
-    sendQuery('getTokenPrice', parseTokenPriceQuery);
-  }, []);
-  React.useEffect(() => {
-    sendQuery('getBuyLimit', parseBuyLimitQuery);
-  }, []);
+  // React.useEffect(() => {
+  //   sendQuery('getTokenPrice', parseTokenPriceQuery);
+  // }, []);
+  // React.useEffect(() => {
+  //   sendQuery('getBuyLimit', parseBuyLimitQuery);
+  // }, []);
 
   /// transaction
-  const contract = new SmartContract({ address: new Address(contractAddress) });
 
   const sendUpdatePriceTransaction = async (functionName: string, args: any[]) => {
     const tx = contract.call({

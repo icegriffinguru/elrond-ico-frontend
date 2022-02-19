@@ -1,5 +1,5 @@
 export const contractAddress =
-  'erd1qqqqqqqqqqqqqpgq3u5py58u702623ayxen2yvsfaqphhema6xwsgr7u6l';
+  'erd1qqqqqqqqqqqqqpgqtf9ukgamu9ulq824vt7r5vsnd5ja68x86xws6n8tlq';
 export const contractAbiUrl = '/abi/elrond-ico-sc.abi.json';
 export const contractName = 'IcoManager';
 

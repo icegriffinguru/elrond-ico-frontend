@@ -59,7 +59,7 @@ const Admin = () => {
   console.log('account', account);
 
   const [tokenId, setTokenId] = React.useState<string | undefined>();
-  const [tokenPrice, setTokenPrice] = React.useState<number>();
+  const [tokenPrice, setTokenPrice] = React.useState<number | undefined>();
   const [buyLimit, setBuyLimit] = React.useState<number>();
   const [startTime, setStartTime] = React.useState<number>();
   const [endTime, setEndTime] = React.useState<number>();
@@ -97,7 +97,7 @@ const Admin = () => {
       const value = res.firstValue.valueOf().toString();
       setTokenId(value);
     })();
-  });
+  }, [contract]);
 
   React.useEffect(() => {
     if (!contract) return;
@@ -108,7 +108,7 @@ const Admin = () => {
       const value = parseFloat(Egld.raw(res.firstValue.valueOf()).toDenominated());
       setTokenPrice(value);
     })();
-  });
+  }, [contract]);
 
   React.useEffect(() => {
     if (!contract) return;
@@ -119,7 +119,7 @@ const Admin = () => {
       const value = parseFloat(Egld.raw(res.firstValue.valueOf()).toDenominated());
       setBuyLimit(value);
     })();
-  });
+  }, [contract]);
 
   React.useEffect(() => {
     if (!contract) return;
@@ -130,7 +130,7 @@ const Admin = () => {
       const value = parseInt(res.firstValue.valueOf());
       setStartTime(value);
     })();
-  });
+  }, [contract]);
   
   React.useEffect(() => {
     if (!contract) return;
@@ -141,7 +141,7 @@ const Admin = () => {
       const value = parseInt(res.firstValue.valueOf());
       setEndTime(value);
     })();
-  });
+  }, [contract]);
 
   const sendTransaction = async (functionName: string, args: any[]) => {
     if (!contract) return;
@@ -176,6 +176,7 @@ const Admin = () => {
 
   const updateTokenPrice = (e: any) => {
     e.preventDefault();
+    console.log('tokenPrice', tokenPrice);
     if (!tokenPrice){
       alert('Token Price cannot be null.');
       return;
@@ -209,7 +210,7 @@ const Admin = () => {
       return;
     }
     const args = [new U64Value(new BigNumber(startTime)), new U64Value(new BigNumber(endTime))];
-    sendTransaction('updateBuyLimit', args);
+    sendTransaction('updateTimes', args);
   };
 
   //
@@ -245,9 +246,10 @@ const Admin = () => {
       </div>
       <div className="form-group row">
         <label className="col-sm-3 col-form-label">Buy Limit:</label>
-        <div className="col-sm-7">
+        <div className="col-sm-5">
           <input type="number" className="form-control" id="esdtAmount" defaultValue={buyLimit} onChange={(e) => setBuyLimit(parseFloat(e.target.value))} />
         </div>
+        <div className='col-sm-2'>EGLD</div>
         <div className="col-sm-2">
           <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateBuyLimit}>Update</button>
         </div>
@@ -256,15 +258,16 @@ const Admin = () => {
         <label className="col-sm-3 col-form-label">Activation Time:</label>
         <div className="col-sm-7">
           <DateTimePicker
-            value={new Date(startTime ? startTime : 0)}
-            onChange={onStartTimeChanged} />
+            value={new Date(startTime ? startTime * Millis : 0)}
+            onChange={onStartTimeChanged}
+            />
         </div>
       </div>
       <div className="form-group row">
         <label className="col-sm-3 col-form-label">End Time:</label>
         <div className="col-sm-7">
           <DateTimePicker
-            value={new Date((endTime ? endTime : 0))}
+            value={new Date((endTime ? endTime * Millis : 0))}
             onChange={onEndTimeChanged} />
         </div>
         <div className="col-sm-2">

@@ -46,11 +46,11 @@
             "mutability": "mutable",
             "inputs": [
                 {
-                    "name": "activation_timestamp",
+                    "name": "start_time",
                     "type": "u64"
                 },
                 {
-                    "name": "duration_timestamp",
+                    "name": "end_time",
                     "type": "u64"
                 }
             ],
@@ -165,7 +165,7 @@
             ]
         },
         {
-            "name": "getActivationTimestamp",
+            "name": "getStartTime",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -175,7 +175,7 @@
             ]
         },
         {
-            "name": "getDurationTimestamp",
+            "name": "getEndTime",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [

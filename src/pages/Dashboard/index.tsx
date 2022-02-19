@@ -15,7 +15,6 @@ const Dashboard = () => {
         <div className='col-12 col-md-10 mx-auto'>
           <div className='card shadow-sm rounded border-0'>
             <div className='card-body p-1'>
-              <TopInfo />
               <hr />
               <Routes>
                 <Route

@@ -76,59 +76,11 @@ const Admin = () => {
     })();
   }, []); // [] makes useEffect run once
 
-  /// query
-  // const sendQuery = (functionName: string, getQueryResult: any) => {
-  //   const query = new Query({
-  //     address: new Address(contractAddress),
-  //     func: new ContractFunction(functionName)
-  //   });
-  //   proxy
-  //     .queryContract(query)
-  //     .then(({ returnData }) => {
-  //       console.log('Query: ', functionName, returnData);
-  //       getQueryResult(returnData);
-  //     })
-  //     .catch((err) => {
-  //       console.error(`Unable to call ${functionName} VM query`, err);
-  //     });
-  // };
   const sendQuery = async (interaction: Interaction) => {
     if (!contract) return;
     const queryResponse = await contract.runQuery(proxy, interaction.buildQuery());
     const res = interaction.interpretQueryResponse(queryResponse);
     return res;
-  };
-
-  const parseTokenIdQuery = (returnData: any) => {
-    let [decoded] = returnData;
-    decoded = Buffer.from(decoded, 'base64').toString();
-    setTokenId(decoded);
-  };
-
-  const parseTokenPriceQuery = (returnData: any) => {
-    let [decoded] = returnData;
-    decoded = Buffer.from(decoded, 'base64').toString('hex');
-    decoded = parseInt(decoded, 16);
-    decoded = Egld.raw(decoded).toDenominated();
-    decoded = parseFloat(decoded);
-    setTokenPrice(decoded);
-  };
-
-  const parseBuyLimitQuery = (returnData: any) => {
-    let [decoded] = returnData;
-    decoded = Buffer.from(decoded, 'base64').toString('hex');
-    decoded = parseInt(decoded, 16);
-    decoded = Egld.raw(decoded).toDenominated();
-    decoded = parseFloat(decoded);
-    setBuyLimit(decoded);
-  };
-
-  const parseStartTimeQuery = (returnData: any) => {
-    let [decoded] = returnData;
-    decoded = Buffer.from(decoded, 'base64').toString('hex');
-    decoded = parseInt(decoded, 16);
-    decoded = new Date(decoded * 1000);
-    setBuyLimit(decoded);
   };
 
   React.useEffect(() => {
@@ -141,16 +93,31 @@ const Admin = () => {
       setTokenId(value);
     })();
   });
-  // React.useEffect(() => {
-  //   sendQuery('getTokenPrice', parseTokenPriceQuery);
-  // }, []);
-  // React.useEffect(() => {
-  //   sendQuery('getBuyLimit', parseBuyLimitQuery);
-  // }, []);
 
-  /// transaction
+  React.useEffect(() => {
+    if (!contract) return;
+    (async () => {
+      const interaction: Interaction = contract.methods.getTokenPrice();
+      const res: QueryResponseBundle | undefined = await sendQuery(interaction);
+      if (!res || !res.returnCode.isSuccess()) return;
+      const value = parseFloat(Egld.raw(res.firstValue.valueOf()).toDenominated());
+      setTokenPrice(value);
+    })();
+  });
 
-  const sendUpdatePriceTransaction = async (functionName: string, args: any[]) => {
+  React.useEffect(() => {
+    if (!contract) return;
+    (async () => {
+      const interaction: Interaction = contract.methods.getBuyLimit();
+      const res: QueryResponseBundle | undefined = await sendQuery(interaction);
+      if (!res || !res.returnCode.isSuccess()) return;
+      const value = parseFloat(Egld.raw(res.firstValue.valueOf()).toDenominated());
+      setBuyLimit(value);
+    })();
+  });
+  
+
+  const sendTransaction = async (functionName: string, args: any[]) => {
     if (!contract) return;
     const tx = contract.call({
       func: new ContractFunction(functionName),
@@ -178,7 +145,7 @@ const Admin = () => {
       return;
     }
     const args = [BytesValue.fromUTF8(tokenId)];
-    sendUpdatePriceTransaction('updateTokenId', args);
+    sendTransaction('updateTokenId', args);
   };
 
   const updateTokenPrice = (e: any) => {
@@ -188,7 +155,7 @@ const Admin = () => {
       return;
     }
     const args = [new BigUIntValue(Balance.egld(tokenPrice).valueOf())];
-    sendUpdatePriceTransaction('updateTokenPrice', args);
+    sendTransaction('updateTokenPrice', args);
   };
 
   const updateBuyLimit = (e: any) => {
@@ -198,7 +165,7 @@ const Admin = () => {
       return;
     }
     const args = [new BigUIntValue(Balance.egld(buyLimit).valueOf())];
-    sendUpdatePriceTransaction('updateBuyLimit', args);
+    sendTransaction('updateBuyLimit', args);
   };
 
   return (
@@ -226,7 +193,7 @@ const Admin = () => {
       <div className="form-group row">
         <label className="col-sm-3 col-form-label">Buy Limit:</label>
         <div className="col-sm-7">
-          <input type="text" className="form-control" id="esdtAmount" defaultValue={buyLimit} onChange={(e) => setBuyLimit(parseFloat(e.target.value))} />
+          <input type="number" className="form-control" id="esdtAmount" defaultValue={buyLimit} onChange={(e) => setBuyLimit(parseFloat(e.target.value))} />
         </div>
         <div className="col-sm-2">
           <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateBuyLimit}>Update</button>

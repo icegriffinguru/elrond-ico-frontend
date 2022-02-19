@@ -56,7 +56,6 @@ export const getEsdtBalance = async ({
 }: GetEsdtBalanceType) => {
   try {
     const url = `${apiAddress}/address/${address}/esdt/${tokenId}`;
-    console.log('url', url);
     const { data } = await axios.get(url, {
       timeout
     });

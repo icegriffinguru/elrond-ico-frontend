@@ -201,7 +201,7 @@ const Admin = () => {
       alert('Start Time and End Time should be set.');
       return;
     }
-    if (startTime <= (new Date).getTime() / Millis){
+    if (startTime <= (new Date()).getTime() / Millis){
       alert('Start Time cannot be past.');
       return;
     }
@@ -211,6 +211,11 @@ const Admin = () => {
     }
     const args = [new U64Value(new BigNumber(startTime)), new U64Value(new BigNumber(endTime))];
     sendTransaction('updateTimes', args);
+  };
+
+  const withdrawEgld = (e: any) => {
+    e.preventDefault();
+    sendTransaction('withdraw', []);
   };
 
   //
@@ -272,6 +277,12 @@ const Admin = () => {
         </div>
         <div className="col-sm-2">
           <button className="btn btn-primary px-3 my-1 input-right-button" onClick={updateTimes}>Update</button>
+        </div>
+      </div>
+      <div className="form-group row">
+        <div className="col-sm-5"></div>
+        <div className="col-sm-2">
+          <button className="btn btn-primary px-3 my-1 input-right-button" onClick={withdrawEgld}>Withdraw Egld</button>
         </div>
       </div>
     </form>

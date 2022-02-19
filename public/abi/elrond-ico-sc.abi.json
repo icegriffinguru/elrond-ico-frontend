@@ -1,0 +1,208 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.60.0-nightly",
+            "commitHash": "30b3f35c420694a4f24e5a4df00f06073f4f3a37",
+            "commitDate": "2022-02-17",
+            "channel": "Nightly",
+            "short": "rustc 1.60.0-nightly (30b3f35c4 2022-02-17)"
+        },
+        "contractCrate": {
+            "name": "elrond-ico-sc",
+            "version": "0.0.0"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.27.4"
+        }
+    },
+    "docs": [
+        "Manage ICO of a new ESDT"
+    ],
+    "name": "IcoManager",
+    "constructor": {
+        "inputs": [],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "docs": [
+                "endpoint - only owner ///"
+            ],
+            "name": "updateTokenId",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "updateTimes",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "activation_timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "duration_timestamp",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "updateTokenPrice",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_price",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "updateBuyLimit",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "buy_limit",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "withdraw",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "withdrawEsdt",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "endpoint ///"
+            ],
+            "name": "buyTokens",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "status",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Status"
+                }
+            ]
+        },
+        {
+            "name": "getTokenAvailable",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "storage ///"
+            ],
+            "name": "getTokenId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getBuyLimit",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTokenPrice",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getActivationTimestamp",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getDurationTimestamp",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        }
+    ],
+    "hasCallback": false,
+    "types": {
+        "Status": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "NotStarted",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Started",
+                    "discriminant": 1
+                },
+                {
+                    "name": "Ended",
+                    "discriminant": 2
+                }
+            ]
+        }
+    }
+}
